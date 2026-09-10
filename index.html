@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark" class="dark">
+<html lang="en" data-theme="dark" class="dark overflow-x-hidden">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     <title>Ngirit Gateway | High-Speed Edge Proxy</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -27,7 +27,7 @@
             keyframes: {
               float: {
                 '0%, 100%': { transform: 'translateY(0px)' },
-                '50%': { transform: 'translateY(-12px)' },
+                '50%': { transform: 'translateY(-10px)' },
               },
               'gradient-x': {
                 '0%, 100%': { 'background-size': '200% 200%', 'background-position': 'left center' },
@@ -47,8 +47,16 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
+      html, body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+        position: relative;
+      }
+
       * {
         font-family: 'Plus Jakarta Sans', sans-serif;
+        box-sizing: border-box;
       }
       code, pre, .font-mono {
         font-family: 'JetBrains Mono', monospace;
@@ -65,13 +73,15 @@
         pointer-events: none;
       }
 
-      /* Glowing orb gradient animations */
+      /* Glowing orb gradient animations inside clipped container */
       .glow-orb-1 {
         position: absolute;
-        top: 15%;
-        left: 20%;
-        width: 450px;
-        height: 450px;
+        top: 10%;
+        left: 10%;
+        width: 380px;
+        height: 380px;
+        max-width: 90vw;
+        max-height: 90vw;
         background: radial-gradient(circle, rgba(14, 165, 233, 0.22) 0%, rgba(14, 165, 233, 0) 70%);
         border-radius: 50%;
         filter: blur(60px);
@@ -82,9 +92,11 @@
       .glow-orb-2 {
         position: absolute;
         top: 40%;
-        right: 15%;
-        width: 400px;
-        height: 400px;
+        right: 5%;
+        width: 360px;
+        height: 360px;
+        max-width: 90vw;
+        max-height: 90vw;
         background: radial-gradient(circle, rgba(168, 85, 247, 0.20) 0%, rgba(168, 85, 247, 0) 70%);
         border-radius: 50%;
         filter: blur(70px);
@@ -136,28 +148,30 @@
       }
     </style>
   </head>
-  <body class="bg-[#0b0f19] text-slate-100 min-h-screen relative overflow-x-hidden selection:bg-cyan-500 selection:text-white">
+  <body class="bg-[#0b0f19] text-slate-100 min-h-screen relative overflow-x-hidden w-full selection:bg-cyan-500 selection:text-white">
     <!-- Interactive Canvas Particle Field -->
     <canvas id="bg-canvas"></canvas>
 
-    <!-- Background Orbs -->
-    <div class="glow-orb-1"></div>
-    <div class="glow-orb-2"></div>
+    <!-- Background Orbs (Encapsulated in fixed full viewport to prevent horizontal overflow) -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+      <div class="glow-orb-1"></div>
+      <div class="glow-orb-2"></div>
+    </div>
 
     <!-- Cyber Grid Overlay -->
     <div class="fixed inset-0 cyber-grid pointer-events-none z-[1] opacity-60"></div>
 
-    <div class="relative z-10 flex flex-col min-h-screen">
+    <div class="relative z-10 flex flex-col min-h-screen w-full overflow-x-hidden">
       <!-- Navbar -->
-      <nav class="sticky top-0 z-50 glass-panel border-b border-slate-800/80 px-6 py-3.5 transition-all">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+      <nav class="sticky top-0 z-50 glass-panel border-b border-slate-800/80 px-4 sm:px-6 py-3 transition-all w-full">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5 sm:gap-3">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 flex-shrink-0">
               <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
             </div>
             <div>
-              <span class="font-extrabold text-xl tracking-tight text-white flex items-center gap-1.5">
-                NGIRIT <span class="text-xs uppercase px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono">Edge</span>
+              <span class="font-extrabold text-lg sm:text-xl tracking-tight text-white flex items-center gap-1.5">
+                NGIRIT <span class="text-[10px] sm:text-xs uppercase px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono">Edge</span>
               </span>
             </div>
           </div>
@@ -165,19 +179,19 @@
           <div class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
             <a href="#features" class="hover:text-cyan-400 transition-colors">Features</a>
             <a href="#architecture" class="hover:text-cyan-400 transition-colors">Architecture</a>
-            <a href="#sub1" class="hover:text-cyan-400 transition-colors flex items-center gap-1.5">
+            <a href="/sub" class="hover:text-cyan-400 transition-colors flex items-center gap-1.5">
               <span>Subscription</span>
               <span class="inline-block w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
             </a>
           </div>
 
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2 sm:gap-3">
             <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono">
               <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
               Gateway Active
             </div>
-            <a href="#sub2" class="btn btn-sm btn-primary bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 border-0 text-white shadow-md shadow-cyan-500/20 rounded-lg">
-              <i data-lucide="key" class="w-4 h-4"></i>
+            <a href="/sub" class="btn btn-xs sm:btn-sm btn-primary bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 border-0 text-white shadow-md shadow-cyan-500/20 rounded-lg">
+              <i data-lucide="key" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
               <span>Get Sub</span>
             </a>
           </div>
@@ -185,102 +199,102 @@
       </nav>
 
       <!-- Hero Section -->
-      <section class="flex-1 flex items-center justify-center px-6 py-20 lg:py-28">
-        <div class="max-w-5xl mx-auto text-center">
-          <!-- Status Pill -->
-          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel border border-slate-700/60 text-slate-300 text-xs sm:text-sm font-medium mb-8 animate-float">
-            <span class="flex h-2 w-2 relative">
+      <section class="flex-1 flex items-center justify-center px-4 sm:px-6 py-14 sm:py-20 lg:py-28 w-full">
+        <div class="max-w-5xl mx-auto text-center w-full">
+          <!-- Status Pill (Fully Responsive & auto-wrapping) -->
+          <div class="inline-flex max-w-[92vw] items-center justify-center gap-2 px-3 sm:px-4 py-1.5 rounded-full glass-panel border border-slate-700/60 text-slate-300 text-xs sm:text-sm font-medium mb-6 sm:mb-8 animate-float text-center">
+            <span class="flex h-2 w-2 relative flex-shrink-0">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
               <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
             </span>
-            <span>Cloudflare Edge Engine powered by Rust & WebAssembly</span>
+            <span class="truncate sm:whitespace-normal">Cloudflare Edge Engine &bull; Rust WASM</span>
           </div>
 
-          <!-- Main Heading -->
-          <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-tight sm:leading-none mb-6">
-            Next-Gen Tunneling <br class="hidden sm:inline" />
-            <span class="text-shimmer">Low Latency & High Speed</span>
+          <!-- Main Heading (Updated to Low Latency & High Speed, zero overflow) -->
+          <h1 class="text-3xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-tight mb-4 sm:mb-6 break-words">
+            Next-Gen Tunneling <br />
+            <span class="text-shimmer">Low Latency &amp; High Speed</span>
           </h1>
 
           <!-- Description -->
-          <p class="max-w-2xl mx-auto text-slate-400 text-base sm:text-lg mb-10 leading-relaxed">
+          <p class="max-w-2xl mx-auto text-slate-400 text-sm sm:text-lg mb-8 sm:mb-10 leading-relaxed px-2">
             Ultra-resilient edge gateway built on Rust WASM. Seamless protocol multiplexing with intelligent failover and native KV routing.
           </p>
 
-          <!-- Action Buttons -->
-          <div class="flex flex-wrap items-center justify-center gap-4">
-            <a href="#sub3" class="btn btn-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white border-0 shadow-xl shadow-cyan-500/25 px-8 rounded-xl font-semibold gap-2 transition-all">
-              <i data-lucide="download" class="w-5 h-5"></i>
+          <!-- Action Buttons (Responsive column on mobile) -->
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full max-w-xs sm:max-w-none mx-auto">
+            <a href="/sub" class="btn btn-md sm:btn-lg w-full sm:w-auto bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white border-0 shadow-xl shadow-cyan-500/25 px-6 sm:px-8 rounded-xl font-semibold gap-2 transition-all">
+              <i data-lucide="download" class="w-4 h-4 sm:w-5 sm:h-5"></i>
               Manage Subscription
             </a>
-            <a href="#features" class="btn btn-lg glass-panel hover:bg-slate-800/80 text-slate-200 border-slate-700/60 px-8 rounded-xl font-semibold gap-2 transition-all">
-              <i data-lucide="compass" class="w-5 h-5"></i>
+            <a href="#features" class="btn btn-md sm:btn-lg w-full sm:w-auto glass-panel hover:bg-slate-800/80 text-slate-200 border-slate-700/60 px-6 sm:px-8 rounded-xl font-semibold gap-2 transition-all">
+              <i data-lucide="compass" class="w-4 h-4 sm:w-5 sm:h-5"></i>
               Explore Protocol
             </a>
           </div>
 
           <!-- Live Ping Counter / Edge Metrics -->
-          <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-            <div class="glass-card rounded-2xl p-4 text-center">
-              <div class="text-2xl font-bold font-mono text-cyan-400" id="stat-latency">-- ms</div>
-              <div class="text-xs text-slate-400 mt-1">Client Edge Latency</div>
+          <div class="mt-12 sm:mt-16 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto w-full px-1">
+            <div class="glass-card rounded-2xl p-3 sm:p-4 text-center">
+              <div class="text-xl sm:text-2xl font-bold font-mono text-cyan-400" id="stat-latency">-- ms</div>
+              <div class="text-[11px] sm:text-xs text-slate-400 mt-1">Client Edge Latency</div>
             </div>
-            <div class="glass-card rounded-2xl p-4 text-center">
-              <div class="text-2xl font-bold font-mono text-purple-400">WASM</div>
-              <div class="text-xs text-slate-400 mt-1">Rust Core Runtime</div>
+            <div class="glass-card rounded-2xl p-3 sm:p-4 text-center">
+              <div class="text-xl sm:text-2xl font-bold font-mono text-purple-400">WASM</div>
+              <div class="text-[11px] sm:text-xs text-slate-400 mt-1">Rust Core Runtime</div>
             </div>
-            <div class="glass-card rounded-2xl p-4 text-center">
-              <div class="text-2xl font-bold font-mono text-pink-400">Multi-Proto</div>
-              <div class="text-xs text-slate-400 mt-1">VLESS / Trojan / SS</div>
+            <div class="glass-card rounded-2xl p-3 sm:p-4 text-center">
+              <div class="text-xl sm:text-2xl font-bold font-mono text-pink-400">Multi-Proto</div>
+              <div class="text-[11px] sm:text-xs text-slate-400 mt-1">VLESS / Trojan / SS</div>
             </div>
-            <div class="glass-card rounded-2xl p-4 text-center">
-              <div class="text-2xl font-bold font-mono text-emerald-400">99.99%</div>
-              <div class="text-xs text-slate-400 mt-1">Global Uptime</div>
+            <div class="glass-card rounded-2xl p-3 sm:p-4 text-center">
+              <div class="text-xl sm:text-2xl font-bold font-mono text-emerald-400">99.99%</div>
+              <div class="text-[11px] sm:text-xs text-slate-400 mt-1">Global Uptime</div>
             </div>
           </div>
         </div>
       </section>
 
       <!-- Features Section -->
-      <section id="features" class="py-20 px-6 relative z-10 border-t border-slate-800/60">
-        <div class="max-w-6xl mx-auto">
-          <div class="text-center mb-16">
-            <h2 class="text-3xl sm:text-4xl font-extrabold text-white mb-3">Architected for Speed</h2>
-            <p class="text-slate-400 text-sm sm:text-base max-w-xl mx-auto">
+      <section id="features" class="py-16 sm:py-20 px-4 sm:px-6 relative z-10 border-t border-slate-800/60 w-full">
+        <div class="max-w-6xl mx-auto w-full">
+          <div class="text-center mb-12 sm:mb-16">
+            <h2 class="text-2xl sm:text-4xl font-extrabold text-white mb-3">Architected for Speed</h2>
+            <p class="text-slate-400 text-xs sm:text-base max-w-xl mx-auto">
               Optimized for minimal CPU footprint and ultra-low latency data forwarding.
             </p>
           </div>
 
-          <div class="grid md:grid-cols-3 gap-6">
+          <div class="grid md:grid-cols-3 gap-5 sm:gap-6">
             <!-- Feature 1 -->
-            <div class="glass-card rounded-2xl p-7 relative overflow-hidden group">
-              <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-5 group-hover:scale-110 transition-transform">
-                <i data-lucide="zap" class="w-6 h-6"></i>
+            <div class="glass-card rounded-2xl p-6 sm:p-7 relative overflow-hidden group">
+              <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-4 sm:mb-5 group-hover:scale-110 transition-transform">
+                <i data-lucide="zap" class="w-5 h-5 sm:w-6 sm:h-6"></i>
               </div>
-              <h3 class="text-xl font-bold text-white mb-2">Zero-Copy WebAssembly</h3>
-              <p class="text-slate-400 text-sm leading-relaxed">
+              <h3 class="text-lg sm:text-xl font-bold text-white mb-2">Zero-Copy WebAssembly</h3>
+              <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
                 Compiled directly from Rust to WASM bytecode, achieving sub-millisecond connection dispatching and lightweight memory overhead.
               </p>
             </div>
 
             <!-- Feature 2 -->
-            <div class="glass-card rounded-2xl p-7 relative overflow-hidden group">
-              <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 mb-5 group-hover:scale-110 transition-transform">
-                <i data-lucide="globe" class="w-6 h-6"></i>
+            <div class="glass-card rounded-2xl p-6 sm:p-7 relative overflow-hidden group">
+              <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 mb-4 sm:mb-5 group-hover:scale-110 transition-transform">
+                <i data-lucide="globe" class="w-5 h-5 sm:w-6 sm:h-6"></i>
               </div>
-              <h3 class="text-xl font-bold text-white mb-2">Global KV Relay</h3>
-              <p class="text-slate-400 text-sm leading-relaxed">
+              <h3 class="text-lg sm:text-xl font-bold text-white mb-2">Global KV Relay</h3>
+              <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
                 Dynamic edge routing synchronized with Cloudflare KV storage for resilient upstream failovers without redeployment.
               </p>
             </div>
 
             <!-- Feature 3 -->
-            <div class="glass-card rounded-2xl p-7 relative overflow-hidden group">
-              <div class="w-12 h-12 rounded-xl bg-pink-500/10 border border-pink-500/30 flex items-center justify-center text-pink-400 mb-5 group-hover:scale-110 transition-transform">
-                <i data-lucide="lock" class="w-6 h-6"></i>
+            <div class="glass-card rounded-2xl p-6 sm:p-7 relative overflow-hidden group">
+              <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-pink-500/10 border border-pink-500/30 flex items-center justify-center text-pink-400 mb-4 sm:mb-5 group-hover:scale-110 transition-transform">
+                <i data-lucide="lock" class="w-5 h-5 sm:w-6 sm:h-6"></i>
               </div>
-              <h3 class="text-xl font-bold text-white mb-2">End-to-End Encryption</h3>
-              <p class="text-slate-400 text-sm leading-relaxed">
+              <h3 class="text-lg sm:text-xl font-bold text-white mb-2">End-to-End Encryption</h3>
+              <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
                 Seamless transport layer security wrapping your streams directly inside WebSocket pipelines across 300+ edge locations.
               </p>
             </div>
@@ -289,40 +303,40 @@
       </section>
 
       <!-- Interactive Node Demo / Terminal Preview -->
-      <section id="architecture" class="py-16 px-6 relative z-10">
-        <div class="max-w-4xl mx-auto">
-          <div class="glass-panel rounded-2xl overflow-hidden shadow-2xl border border-slate-700/60">
+      <section id="architecture" class="py-14 sm:py-16 px-4 sm:px-6 relative z-10 w-full">
+        <div class="max-w-4xl mx-auto w-full">
+          <div class="glass-panel rounded-2xl overflow-hidden shadow-2xl border border-slate-700/60 w-full">
             <!-- Terminal Header -->
             <div class="bg-slate-900/90 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <div class="w-3 h-3 rounded-full bg-rose-500/80"></div>
                 <div class="w-3 h-3 rounded-full bg-amber-500/80"></div>
                 <div class="w-3 h-3 rounded-full bg-emerald-500/80"></div>
-                <span class="ml-2 text-xs font-mono text-slate-400">ngirit-edge-runtime ~ monitor</span>
+                <span class="ml-2 text-[11px] sm:text-xs font-mono text-slate-400 truncate">ngirit-edge-runtime</span>
               </div>
-              <div class="text-xs font-mono text-cyan-400">status: connected</div>
+              <div class="text-[11px] sm:text-xs font-mono text-cyan-400">online</div>
             </div>
-            <!-- Terminal Body -->
-            <div class="p-6 font-mono text-xs sm:text-sm text-slate-300 space-y-2 bg-[#0a0e17]/90">
+            <!-- Terminal Body (Horizontally scrollable if long, no page breaking) -->
+            <div class="p-4 sm:p-6 font-mono text-xs sm:text-sm text-slate-300 space-y-2 bg-[#0a0e17]/90 overflow-x-auto break-all sm:break-normal">
               <p class="text-slate-500"># Cloudflare Worker initialization</p>
               <p><span class="text-cyan-400">[INFO]</span> Initializing Rust WASM engine: <span class="text-emerald-400">v2r::runtime::ready</span></p>
               <p><span class="text-cyan-400">[INFO]</span> Multi-protocol router ready: <span class="text-purple-400">VLESS</span>, <span class="text-purple-400">Trojan</span>, <span class="text-purple-400">Shadowsocks</span></p>
               <p><span class="text-cyan-400">[INFO]</span> Dynamic KV Proxy synchronization active</p>
-              <p class="text-emerald-400 animate-pulse"><span class="text-cyan-400">[TUNNEL]</span> Ready to handle WebSocket upgrade requests at /:proxyip</p>
+              <p class="text-emerald-400 animate-pulse"><span class="text-cyan-400">[TUNNEL]</span> Ready for WebSocket connections at /:proxyip</p>
             </div>
           </div>
         </div>
       </section>
 
       <!-- Footer -->
-      <footer class="glass-panel border-t border-slate-800/80 py-8 px-6 mt-auto">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-          <div class="flex items-center gap-2">
-            <div class="w-2 h-2 rounded-full bg-cyan-400"></div>
+      <footer class="glass-panel border-t border-slate-800/80 py-6 sm:py-8 px-4 sm:px-6 mt-auto w-full">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400 text-center sm:text-left">
+          <div class="flex items-center gap-2 justify-center sm:justify-start">
+            <div class="w-2 h-2 rounded-full bg-cyan-400 flex-shrink-0"></div>
             <span>Ngirit Gateway &bull; Powered by Cloudflare Workers &amp; Rust</span>
           </div>
-          <div class="flex items-center gap-6">
-            <a href="#sub4" class="hover:text-cyan-400 transition-colors">Subscription</a>
+          <div class="flex items-center gap-5 justify-center">
+            <a href="/sub" class="hover:text-cyan-400 transition-colors">Subscription</a>
             <a href="#features" class="hover:text-cyan-400 transition-colors">Features</a>
             <a href="https://github.com" target="_blank" class="hover:text-cyan-400 transition-colors">GitHub</a>
           </div>
@@ -332,7 +346,6 @@
 
     <!-- Particle Animation Script -->
     <script>
-      // Initialize Lucide Icons
       lucide.createIcons();
 
       // Simple client-side latency measurement
@@ -344,10 +357,10 @@
           if (latencyDisplay) latencyDisplay.innerText = lat + ' ms';
         })
         .catch(() => {
-          if (latencyDisplay) latencyDisplay.innerText = '12 ms';
+          if (latencyDisplay) latencyDisplay.innerText = '18 ms';
         });
 
-      // Canvas Interactive Constellation Particles (Zero Server Overhead)
+      // Canvas Interactive Constellation Particles
       const canvas = document.getElementById('bg-canvas');
       const ctx = canvas.getContext('2d');
 
@@ -360,12 +373,12 @@
       });
 
       const particles = [];
-      const particleCount = Math.min(Math.floor(window.innerWidth / 15), 65);
+      const particleCount = Math.min(Math.floor(window.innerWidth / 16), 55);
 
       const mouse = {
         x: null,
         y: null,
-        radius: 120,
+        radius: 100,
       };
 
       window.addEventListener('mousemove', (e) => {
@@ -382,9 +395,9 @@
         constructor() {
           this.x = Math.random() * width;
           this.y = Math.random() * height;
-          this.vx = (Math.random() - 0.5) * 0.7;
-          this.vy = (Math.random() - 0.5) * 0.7;
-          this.radius = Math.random() * 2 + 1;
+          this.vx = (Math.random() - 0.5) * 0.6;
+          this.vy = (Math.random() - 0.5) * 0.6;
+          this.radius = Math.random() * 1.8 + 0.8;
           this.color = Math.random() > 0.5 ? '#38bdf8' : '#a855f7';
         }
 
@@ -395,7 +408,6 @@
           if (this.x < 0 || this.x > width) this.vx *= -1;
           if (this.y < 0 || this.y > height) this.vy *= -1;
 
-          // Mouse push
           if (mouse.x !== null && mouse.y !== null) {
             const dx = mouse.x - this.x;
             const dy = mouse.y - this.y;
@@ -403,8 +415,8 @@
             if (dist < mouse.radius) {
               const force = (mouse.radius - dist) / mouse.radius;
               const angle = Math.atan2(dy, dx);
-              this.x -= Math.cos(angle) * force * 3;
-              this.y -= Math.sin(angle) * force * 3;
+              this.x -= Math.cos(angle) * force * 2.5;
+              this.y -= Math.sin(angle) * force * 2.5;
             }
           }
         }
@@ -434,13 +446,13 @@
             const dy = particles[i].y - particles[j].y;
             const dist = Math.sqrt(dx * dx + dy * dy);
 
-            if (dist < 110) {
+            if (dist < 100) {
               ctx.beginPath();
               ctx.moveTo(particles[i].x, particles[i].y);
               ctx.lineTo(particles[j].x, particles[j].y);
               ctx.strokeStyle = '#38bdf8';
-              ctx.globalAlpha = (1 - dist / 110) * 0.22;
-              ctx.lineWidth = 0.8;
+              ctx.globalAlpha = (1 - dist / 100) * 0.2;
+              ctx.lineWidth = 0.7;
               ctx.stroke();
             }
           }
