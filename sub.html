@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ngirit Gateway | Subscription Center</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                cyan: '#06b6d4',
+                purple: '#8b5cf6',
+                pink: '#ec4899',
+                accent: '#3b82f6',
+              }
+            },
+            animation: {
+              'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'float': 'float 6s ease-in-out infinite',
+              'spin-slow': 'spin 12s linear infinite',
+            },
+            keyframes: {
+              float: {
+                '0%, 100%': { transform: 'translateY(0px)' },
+                '50%': { transform: 'translateY(-10px)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <!-- DaisyUI CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.24/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <!-- Fonts & Icons & QR Code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+      * {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+      }
+      code, pre, .font-mono {
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      /* Animated Canvas Background */
+      #bg-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .glow-orb-cyan {
+        position: absolute;
+        top: 10%;
+        right: 20%;
+        width: 480px;
+        height: 480px;
+        background: radial-gradient(circle, rgba(6, 182, 212, 0.22) 0%, rgba(6, 182, 212, 0) 70%);
+        border-radius: 50%;
+        filter: blur(75px);
+        animation: float 7s ease-in-out infinite alternate;
+        pointer-events: none;
+      }
+
+      .glow-orb-purple {
+        position: absolute;
+        bottom: 15%;
+        left: 15%;
+        width: 450px;
+        height: 450px;
+        background: radial-gradient(circle, rgba(147, 51, 234, 0.20) 0%, rgba(147, 51, 234, 0) 70%);
+        border-radius: 50%;
+        filter: blur(80px);
+        animation: float 9s ease-in-out infinite alternate-reverse;
+        pointer-events: none;
+      }
+
+      .glass-panel {
+        background: rgba(15, 23, 42, 0.65);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .glass-card {
+        background: rgba(30, 41, 59, 0.45);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .glass-card:hover {
+        background: rgba(30, 41, 59, 0.70);
+        border-color: rgba(6, 182, 212, 0.35);
+        box-shadow: 0 10px 30px -10px rgba(6, 182, 212, 0.15);
+      }
+
+      .text-shimmer {
+        background: linear-gradient(135deg, #ffffff 0%, #38bdf8 50%, #c084fc 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-size: 200% auto;
+      }
+
+      .cyber-grid {
+        background-image: linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+                          linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+        background-size: 40px 40px;
+      }
+
+      /* Animated border glow on selected item */
+      .neon-border {
+        box-shadow: 0 0 20px -3px rgba(6, 182, 212, 0.4);
+      }
+    </style>
+  </head>
+  <body class="bg-[#0b0f19] text-slate-100 min-h-screen relative overflow-x-hidden selection:bg-cyan-500 selection:text-white">
+    <!-- Interactive Waves & Particle Background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Ambient Glow Orbs -->
+    <div class="glow-orb-cyan"></div>
+    <div class="glow-orb-purple"></div>
+
+    <!-- Cyber Grid Overlay -->
+    <div class="fixed inset-0 cyber-grid pointer-events-none z-[1] opacity-60"></div>
+
+    <div class="relative z-10 flex flex-col min-h-screen">
+      <!-- Navbar -->
+      <nav class="sticky top-0 z-50 glass-panel border-b border-slate-800/80 px-6 py-3.5">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+          <a href="/" class="flex items-center gap-3 group">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform">
+              <i data-lucide="arrow-left" class="w-5 h-5 text-white"></i>
+            </div>
+            <div>
+              <span class="font-extrabold text-lg tracking-tight text-white flex items-center gap-1.5">
+                NGIRIT <span class="text-xs uppercase px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono">Sub</span>
+              </span>
+            </div>
+          </a>
+
+          <div class="flex items-center gap-3">
+            <a href="/" class="btn btn-sm btn-ghost text-slate-300 hover:text-white gap-1.5">
+              <i data-lucide="home" class="w-4 h-4"></i>
+              <span class="hidden sm:inline">Home</span>
+            </a>
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono">
+              <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+              Secure Tunnel Link
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Main Content -->
+      <main class="flex-1 max-w-5xl mx-auto w-full px-6 py-12">
+        <!-- Header -->
+        <div class="text-center max-w-2xl mx-auto mb-12">
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel border border-slate-700/60 text-slate-300 text-xs font-mono mb-4 animate-float">
+            <i data-lucide="zap" class="w-3.5 h-3.5 text-cyan-400"></i>
+            Auto-Generated Subscription Nodes
+          </div>
+          <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4">
+            Connect to <span class="text-shimmer">Edge Network</span>
+          </h1>
+          <p class="text-slate-400 text-sm sm:text-base">
+            Import your protocol links into any client (v2rayNG, Nekobox, Clash, Sing-box, Shadowrocket) with one click.
+          </p>
+        </div>
+
+        <!-- Quick Action Bar -->
+        <div class="glass-panel rounded-2xl p-4 sm:p-6 mb-8 flex flex-col sm:flex-row items-center justify-between gap-4 border border-slate-700/70">
+          <div class="flex items-center gap-3.5 w-full sm:w-auto">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-cyan-500/20">
+              <i data-lucide="link" class="w-6 h-6 text-white"></i>
+            </div>
+            <div>
+              <div class="font-bold text-white text-base">Raw Subscription Endpoint</div>
+              <div class="text-xs text-slate-400 font-mono" id="sub-url-display">Fetching...</div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <button onclick="copySubUrl()" id="btn-copy-sub" class="btn btn-primary bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white border-0 rounded-xl px-5 text-sm gap-2 w-full sm:w-auto shadow-lg shadow-cyan-500/20">
+              <i data-lucide="copy" class="w-4 h-4"></i>
+              <span id="copy-sub-text">Copy Sub Link</span>
+            </button>
+            <button onclick="copyAllNodes()" class="btn glass-card hover:bg-slate-800 text-slate-200 border-slate-700 rounded-xl px-4 text-sm gap-2" title="Copy all raw configs">
+              <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+              <span class="hidden md:inline">Copy All</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Protocols Grid -->
+        <div class="grid md:grid-cols-2 gap-5" id="nodes-container">
+          <!-- Loading State Cards -->
+          <div class="glass-card rounded-2xl p-6 animate-pulse">
+            <div class="h-6 w-28 bg-slate-700/60 rounded mb-4"></div>
+            <div class="h-10 bg-slate-800/80 rounded mb-4"></div>
+            <div class="h-8 w-full bg-slate-700/40 rounded"></div>
+          </div>
+          <div class="glass-card rounded-2xl p-6 animate-pulse">
+            <div class="h-6 w-28 bg-slate-700/60 rounded mb-4"></div>
+            <div class="h-10 bg-slate-800/80 rounded mb-4"></div>
+            <div class="h-8 w-full bg-slate-700/40 rounded"></div>
+          </div>
+        </div>
+
+        <!-- Supported Clients Section -->
+        <div class="mt-14 glass-panel rounded-2xl p-6 border border-slate-800/80">
+          <div class="text-center mb-6">
+            <h3 class="text-base font-bold text-white uppercase tracking-wider text-xs font-mono text-cyan-400">Supported Clients</h3>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+            <div class="glass-card rounded-xl p-4">
+              <div class="font-bold text-sm text-slate-200">v2rayNG / v2rayN</div>
+              <div class="text-xs text-slate-400 mt-1">Android &bull; Windows</div>
+            </div>
+            <div class="glass-card rounded-xl p-4">
+              <div class="font-bold text-sm text-slate-200">Nekobox / Matsuri</div>
+              <div class="text-xs text-slate-400 mt-1">Android &bull; Multi-Core</div>
+            </div>
+            <div class="glass-card rounded-xl p-4">
+              <div class="font-bold text-sm text-slate-200">Clash Meta / Verge</div>
+              <div class="text-xs text-slate-400 mt-1">Cross Platform</div>
+            </div>
+            <div class="glass-card rounded-xl p-4">
+              <div class="font-bold text-sm text-slate-200">Shadowrocket / Streisand</div>
+              <div class="text-xs text-slate-400 mt-1">iOS &bull; macOS</div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- QR Code Modal -->
+      <dialog id="qr_modal" class="modal modal-bottom sm:modal-middle">
+        <div class="modal-box glass-panel border border-slate-700 text-center max-w-sm bg-[#0f172a]/95">
+          <h3 class="font-bold text-lg text-white mb-2" id="qr-title">Protocol QR Code</h3>
+          <p class="text-xs text-slate-400 mb-6">Scan with your VPN client application</p>
+          <div class="bg-white p-4 rounded-2xl inline-block mx-auto shadow-2xl" id="qrcode"></div>
+          <div class="modal-action justify-center mt-6">
+            <form method="dialog">
+              <button class="btn btn-sm btn-ghost text-slate-300">Close</button>
+            </form>
+          </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
+
+      <!-- Footer -->
+      <footer class="glass-panel border-t border-slate-800/80 py-6 px-6 mt-auto">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+          <div>Ngirit Edge Gateway &bull; Subscription Manager</div>
+          <div class="flex items-center gap-4">
+            <a href="/" class="hover:text-cyan-400 transition-colors">Home</a>
+            <a href="#linkustarto" target="_blank" class="hover:text-cyan-400 transition-colors font-mono">Link</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Animated Waves & Particle Script -->
+    <script>
+      lucide.createIcons();
+
+      const subUrlDisplay = document.getElementById('sub-url-display');
+      const fullSubUrl = window.location.origin + '/link';
+      subUrlDisplay.innerText = fullSubUrl;
+
+      let rawLinks = [];
+
+      // Fetch links from /link
+      async function loadLinks() {
+        const container = document.getElementById('nodes-container');
+        try {
+          const res = await fetch('/link');
+          if (!res.ok) throw new Error('Status ' + res.status);
+          const text = await res.text();
+          rawLinks = text.trim().split('\n').filter(Boolean);
+          renderNodes(rawLinks);
+        } catch (err) {
+          console.warn('Could not fetch /link dynamically, using local configuration:', err);
+          // Fallback demo config
+          rawLinks = [
+            `vless://demo@${window.location.host}:443?encryption=none&type=ws&host=${window.location.host}&path=%2FKR&security=tls#Ngirit-VLESS-Auto`,
+            `trojan://demo@${window.location.host}:443?encryption=none&type=ws&host=${window.location.host}&path=%2FKR&security=tls#Ngirit-Trojan-Auto`,
+            `vmess://eyJ2IjoiMiIsInBzIjoic2lyZW4gdm1lc3MiLCJhZGQiOiIke3dpbmRvdy5sb2NhdGlvbi5ob3N0fSIsInBvcnQiOiI4MCIsImlkIjoiZGVtbyIsImFpZCI6IjAiLCJuZXQiOiJ3cyIsInBhdGgiOiIvS1IifQ==`,
+            `ss://bm9uZTpkZW1v@${window.location.host}:443?plugin=v2ray-plugin%3Btls%3Bmux%3D0%3Bmode%3Dwebsocket%3Bpath%3D%2FKR#Ngirit-Shadowsocks`
+          ];
+          renderNodes(rawLinks);
+        }
+      }
+
+      function getProtocolBadge(link) {
+        if (link.startsWith('vless://')) return { name: 'VLESS', color: 'border-cyan-500/30 text-cyan-400 bg-cyan-500/10' };
+        if (link.startsWith('trojan://')) return { name: 'TROJAN', color: 'border-purple-500/30 text-purple-400 bg-purple-500/10' };
+        if (link.startsWith('vmess://')) return { name: 'VMESS', color: 'border-pink-500/30 text-pink-400 bg-pink-500/10' };
+        if (link.startsWith('ss://')) return { name: 'SHADOWSOCKS', color: 'border-amber-500/30 text-amber-400 bg-amber-500/10' };
+        return { name: 'PROXY', color: 'border-slate-500/30 text-slate-400 bg-slate-500/10' };
+      }
+
+      function renderNodes(links) {
+        const container = document.getElementById('nodes-container');
+        container.innerHTML = '';
+
+        links.forEach((link, idx) => {
+          const badge = getProtocolBadge(link);
+          const card = document.createElement('div');
+          card.className = 'glass-card rounded-2xl p-5 flex flex-col justify-between';
+          card.innerHTML = `
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="px-2.5 py-1 rounded-lg border text-xs font-mono font-semibold ${badge.color}">${badge.name}</span>
+                <span class="text-xs text-slate-400 font-mono">Node #${idx + 1}</span>
+              </div>
+              <div class="bg-slate-900/70 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-300 truncate select-all mb-4">
+                ${link}
+              </div>
+            </div>
+            <div class="flex items-center gap-2 pt-2 border-t border-slate-800/70">
+              <button onclick="copyText('${encodeURIComponent(link)}', this)" class="btn btn-sm flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border-0 rounded-lg text-xs gap-1.5 transition-all">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                <span>Copy Config</span>
+              </button>
+              <button onclick="showQr('${badge.name}', '${encodeURIComponent(link)}')" class="btn btn-sm btn-square bg-slate-800 hover:bg-slate-700 text-slate-200 border-0 rounded-lg text-xs" title="Show QR Code">
+                <i data-lucide="qr-code" class="w-4 h-4"></i>
+              </button>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+
+        lucide.createIcons();
+      }
+
+      function copyText(encoded, btn) {
+        const text = decodeURIComponent(encoded);
+        navigator.clipboard.writeText(text);
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i><span class="text-emerald-400">Copied!</span>`;
+        lucide.createIcons();
+        setTimeout(() => {
+          btn.innerHTML = originalHtml;
+          lucide.createIcons();
+        }, 2000);
+      }
+
+      function copySubUrl() {
+        navigator.clipboard.writeText(fullSubUrl);
+        const txt = document.getElementById('copy-sub-text');
+        txt.innerText = 'Copied!';
+        setTimeout(() => {
+          txt.innerText = 'Copy Sub Link';
+        }, 2000);
+      }
+
+      function copyAllNodes() {
+        if (rawLinks.length === 0) return;
+        navigator.clipboard.writeText(rawLinks.join('\n'));
+        alert('All node configs copied to clipboard!');
+      }
+
+      let qrcodeObj = null;
+      function showQr(title, encoded) {
+        const text = decodeURIComponent(encoded);
+        document.getElementById('qr-title').innerText = title + ' Configuration';
+        const container = document.getElementById('qrcode');
+        container.innerHTML = '';
+        qrcodeObj = new QRCode(container, {
+          text: text,
+          width: 190,
+          height: 190,
+          colorDark: "#090d16",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+        document.getElementById('qr_modal').showModal();
+      }
+
+      // Dynamic Canvas Particle Waves
+      const canvas = document.getElementById('bg-canvas');
+      const ctx = canvas.getContext('2d');
+      let width = (canvas.width = window.innerWidth);
+      let height = (canvas.height = window.innerHeight);
+
+      window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      const nodes = [];
+      const totalNodes = 40;
+      for (let i = 0; i < totalNodes; i++) {
+        nodes.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          r: Math.random() * 2 + 1,
+          color: i % 2 === 0 ? '#06b6d4' : '#8b5cf6'
+        });
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        for (let i = 0; i < nodes.length; i++) {
+          const p = nodes[i];
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x < 0 || p.x > width) p.vx *= -1;
+          if (p.y < 0 || p.y > height) p.vy *= -1;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = 0.5;
+          ctx.fill();
+
+          for (let j = i + 1; j < nodes.length; j++) {
+            const p2 = nodes[j];
+            const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+            if (dist < 130) {
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.strokeStyle = '#06b6d4';
+              ctx.globalAlpha = (1 - dist / 130) * 0.15;
+              ctx.stroke();
+            }
+          }
+        }
+
+        requestAnimationFrame(animate);
+      }
+      animate();
+
+      // Load on start
+      loadLinks();
+    </script>
+  </body>
+</html>
